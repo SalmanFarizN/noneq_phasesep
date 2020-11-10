@@ -78,70 +78,10 @@ def write(pos,vel,t):
  
 
 
-
-
-
-
-def posini():
-    pos1=np.zeros((nparticles,ndims))
-    sep=np.zeros((nparticles))
-    dimsep=np.zeros((ndims))
-    
-    for i in range(nparticles):
-        print(i)
-        if i == 0:
-            for j in range(ndims):
-                pos1[i,j]=np.random.uniform(0.0,length)
-        else:
-            for j in range(ndims):
-                pos1[i,j]=np.random.uniform(0.0,length)
-            
-            for k in range(i):
-                if i!=k:
-                    for l in range(ndims):
-                        dimsep[l]=pos1[i,l]-pos1[k,l]
-                        if dimsep[l] > hlength:
-                            dimsep[l]=dimsep[l]-length
-                        if dimsep[l] <= -hlength:
-                            dimsep[l]=dimsep[l]+length
-                        
-                    #sep[k]=np.linalg.norm(dimsep)
-                    sep[k]=0
-                    for el in range(ndims):
-                        sep[k]=sep[k]+dimsep[el]**2
-                    
-                    sep[k]=np.sqrt(sep[k])
-                
-            while(any(q < 0.6 and q!=0.0 for q in sep)):
-                for j in range(ndims):
-                    pos1[i,j]=np.random.uniform(0.0,length)
-                for k in range(i):
-                    if i!=k:
-                        for l in range(ndims):
-                            dimsep[l]=np.mod(pos1[i,l]-pos1[k,l],length)
-                            if dimsep[l] > hlength:
-                                dimsep[l]=dimsep[l]-length
-                                
-                            if dimsep[l] <= -hlength:
-                                dimsep[l]=dimsep[l]+length
-                            
-                        #sep[k]=np.linalg.norm(dimsep)
-                        sep[k]=0
-                        for el in range(ndims):
-                            sep[k]=sep[k]+dimsep[el]**2
-                        sep[k]=np.sqrt(sep[k])
-    
-    return(pos1)
-                        
-                        
+                   
     
     
-                    
-
-    
-    
-    
-    
+                  
     
 
 @jit(nopython=True) 
@@ -172,7 +112,7 @@ def run():
     
     #Initialising particle positions so that they are spread out randomly and do not overlap
     with objmode(pos ='float64[:,:]'):
-        pos=posini()
+        pos=funcs.posini(shape_params,pbc_params)
         
 
 
