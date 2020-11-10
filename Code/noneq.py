@@ -3,6 +3,7 @@ import h5py
 from numba import jit,objmode
 import time
 import os
+import funcs
 
 #%% Defining model parameters
 nparticles=32
@@ -156,9 +157,11 @@ def run():
     potentialf = np.zeros((nparticles,ndims))
 
   
-    r=np.zeros(ndims)
+    
 
-
+    lj_params=(epsilon,sigma,rc)
+    shape_params=(nparticles,ndims)
+    pbc_params=(length,hlength)
 
     
 
@@ -189,35 +192,7 @@ def run():
     
     #Computing the LJ potential
 
-    for i in range(nparticles):
-        for j in range(i+1,nparticles):
-            
-            #Periodic Boundary Conditions
-            for k in range(ndims):
-                r[k]=pos[i,k]-pos[j,k]
-                if r[k] > hlength:
-                    r[k]=r[k]-length
-                if r[k] <= -hlength:
-                    r[k]=r[k]+length
-                
-                
-            #rnorm=np.linalg.norm(r)
-            
-            rnorm = 0
-            for el in range(ndims):
-                rnorm = rnorm+r[el]**2
-            
-            rnorm = np.sqrt(rnorm)
-            
-            
-            if rnorm < rc:
-                #rnorm=np.linalg.norm(r)
-                part=(sigma/rnorm)**6
-                f=(-24*epsilon/rnorm)*(2*part**2-part)
-         
-                for k in range(ndims):
-                    potentialf[i,k]=potentialf[i,k]+(r[k]/rnorm)*f
-                    potentialf[j,k]=potentialf[j,k]-(r[k]/rnorm)*f
+    potentialf=funcs.lj_force(pos,lj_params,shape_params,pbc_params)
     
     
     
@@ -236,9 +211,7 @@ def run():
 
 
     
-    
-#%% Integrating the positions and velocities
-    
+    # Integrating the positions and velocities
     count=1
     
     
@@ -257,31 +230,7 @@ def run():
         
         
         
-        for i in range(nparticles):
-            for j in range(i+1,nparticles):
-            
-            #Periodic Boundary Conditions
-                for k in range(ndims):
-                    r[k]=pos[i,k]-pos[j,k]
-                    if r[k] > hlength:
-                        r[k]=r[k]-length
-                    if r[k] <= -hlength:
-                        r[k]=r[k]+length
-                
-                rnorm=0
-                for el in range(ndims):
-                    rnorm=rnorm+r[el]**2
-            
-                rnorm=np.sqrt(rnorm)
-                
-            
-                if rnorm < rc:
-                    part=(sigma/rnorm)**6
-                    f=(-24*epsilon/rnorm)*(2*part**2-part)
-         
-                    for k in range(ndims):
-                        potentialf[i,k]=potentialf[i,k]+(r[k]/rnorm)*f
-                        potentialf[j,k]=potentialf[j,k]-(r[k]/rnorm)*f
+        potentialf=funcs.lj_force(pos,lj_params,shape_params,pbc_params)
 
         
         
@@ -320,7 +269,7 @@ def run():
     
     
 
-#%%
+
 
 
 os.chdir('/net/storage/salmanfan96/Data/')
@@ -336,13 +285,10 @@ velocity=hf.create_dataset('vel', (nparticles,spoints,ndims))
 start=time.time()
 run()
 
-#np.savez_compressed("noneqpbc.npz",position=position,velocity=velocity,potf=potf)
 
 end=time.time()
 simtime=end-start
 print(simtime/60,"mints.")
 
 
-
-#%%
 hf.close()
