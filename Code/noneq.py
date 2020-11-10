@@ -155,9 +155,7 @@ def run():
     total_force = np.zeros((nparticles,ndims))
     potentialf = np.zeros((nparticles,ndims))
 
-    sep=np.zeros((nparticles))
-    dimsep=np.zeros((ndims))
-
+  
     r=np.zeros(ndims)
 
 
