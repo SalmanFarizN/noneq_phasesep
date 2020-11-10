@@ -212,8 +212,9 @@ def run():
 
 
 
-os.chdir('/net/storage/salmanfan96/Data/')
-hf=h5py.File('noneqpbc.h5', 'w')
+os.chdir('/home/salmanfan96/')
+os.chdir('/net/storage/salmanfan96/')
+hf=h5py.File('noneqpbc2.h5', 'w')
 spoints=int(tpoints/1000)
 position=hf.create_dataset('pos', (nparticles,spoints,ndims))
 velocity=hf.create_dataset('vel', (nparticles,spoints,ndims))
